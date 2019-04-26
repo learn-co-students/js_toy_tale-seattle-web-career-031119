@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 //Creating toy to render on toy card
   function createToy(toy){
+
     let toyCollectionDiv = document.getElementById('toy-collection')
 
     let toyCardDiv= document.createElement('div')
@@ -45,6 +46,12 @@ document.addEventListener("DOMContentLoaded", function() {
     likeButton.textContent = 'Like'
     likeButton.addEventListener('click', () => {
       updatesLikes(toy.likes, toy.id)
+
+//this .then will set up the page to refresh smoothly after a
+//new like has been added to the page
+      .then(json => {
+        toyLikes.textContent = `${json.likes} Likes`
+      })
     })
 
     toyCardDiv.appendChild(toyName)
@@ -54,6 +61,9 @@ document.addEventListener("DOMContentLoaded", function() {
     toyCollectionDiv.appendChild(toyCardDiv)
   }
 //adding ++ before instantly increments value
+//catch error message not necessary but there in case we had error message
+// concatenate/append + id to the end of the url string, set comma, then
+// open up a block for method, headers, body, .then statements
 function updatesLikes(likes, id){
   return fetch("http://localhost:3000/toys/" + id, {
     method: 'PATCH',
@@ -68,8 +78,9 @@ function updatesLikes(likes, id){
   .catch(err => {
     displayError(err)
   })
-.then(_ => window.location.reload())
+ // .then(_ => window.location.reload())
 }
+
 
 //Create function to add a new toy through a form
   function addNewToy(){
@@ -87,12 +98,19 @@ function handleSubmit(ev){
   let toyName = ev.target.elements['name'].value
   let toyImage = ev.target.elements['image'].value
   saveToy(toyName, toyImage)
-  .then(toy => createToy)
-  createLikeButton()
+
 }
 
+
+//saveToy function passes in name and image (because of the form on the web
+//page) we hard coded likes start point to 0
+//we have a catch err fx but not necessary bc there are no error messages
+//in db
+//.then(toy => createToy(toy)) is passing in toy from the function
+//  createToy(toy) into our .then statement and that refreshes the page
+//automatically without the janky .then => window.location.reload()
 function saveToy(name, image){
-  return fetch("http://localhost:3000/toys", {
+  fetch("http://localhost:3000/toys", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -103,15 +121,16 @@ function saveToy(name, image){
       image: image,
       likes: 0
     })
-  }).then(res => {return res.json()})
+  }).then(res => res.json())
 	.catch(err => {
 		displayError(err)
 	})
-.then(_ => window.location.reload())
+  .then(toy => createToy(toy))
+// .then(_ => window.location.reload())
 }
 
 
-
+//code below was provided by the lab
   addBtn.addEventListener('click', () => {
     // hide & seek with the form
     addToy = !addToy
@@ -123,22 +142,13 @@ function saveToy(name, image){
     }
   })
 
-
-
-
-// OR HERE!
-
-
-
-
-
-
+//Add functions to main to keep track of what you're actually calling
   function main(){
     getToyCollection()
     addNewToy()
-
   }
 
+//call main function at bottom
   main()
 
 
