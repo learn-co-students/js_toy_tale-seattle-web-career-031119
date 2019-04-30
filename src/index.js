@@ -53,12 +53,13 @@ function makeToyCard(toy) {
 
   function clickLike(ev) {
     p.textContent = `${++toy.likes} Likes`
-    patchLike()
+    console.log('likes:', toy.likes)
+    patchLike(toy)
   }
 
-  function patchLike () {
-    newLikes = div.querySelector('p').innerText
-    numLikes = newLikes[0]
+  function patchLike (toy) {
+    // newLikes = div.querySelector('p').innerText
+    // numLikes = newLikes[0]
     return fetch (TOYS_API + "/" + toyId, {
       method: 'PATCH',
       headers: {
@@ -66,7 +67,7 @@ function makeToyCard(toy) {
         "Accept": "application/json"
       },
       body: JSON.stringify({
-        "likes": numLikes
+        "likes": toy.likes
       })
     })
   }
